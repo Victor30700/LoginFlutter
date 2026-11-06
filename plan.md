@@ -272,9 +272,88 @@ Transformar la aplicaciÃƒÆ’Ã‚Â³n en **BOSSUX**, una experiencia fitnes
 
 ---
 
+## Épica 8: Módulo de Planes y Búsqueda de Productos BOSSUX (Integración API REST Real)
+
+Integrar el módulo dinámico de membresías, planes y búsqueda de productos consumiendo las APIs oficiales de **BOSSUX** (`https://vous.bossux.com/`), mostrando de forma destacada el nombre, precio de venta, cantidad/duración y fotografía real de cada plan en una nueva pestaña del Dock de navegación flotante.
+
+### Especificaciones Técnicas y Endpoints de BOSSUX
+
+* **Servidor Base e Imágenes:**
+  * Dominio Base: `https://vous.bossux.com/`
+  * Ruta Base de Fotos: `https://vous.bossux.com/_resources/_planes/` + `[foto_hash.jpg]` (Verificado HTTP 200 OK)
+* **Endpoint de Listado de Planes:**
+  * **Método:** `GET`
+  * **URL:** `https://vous.bossux.com/apx/lplanes`
+  * **Respuesta:** Array JSON con planes (campos: `id`, `plan`, `precio`, `tiempo`, `foto`, `estado`, `tipo`)
+* **Endpoint de Búsqueda de Productos / Planes (`BuscarCodigo`):**
+  * **Método:** `POST`
+  * **URL:** `https://vous.bossux.com/appv/lproduc`
+  * **Body (x-www-form-urlencoded / form-data):** `{ "nombre": "<codigo_o_termino>" }`
+  * **Equivalente Web:**
+    ```javascript
+    function BuscarCodigo() {
+      var codigo = $("#searchnombre").val();
+      var url = "https://vous.bossux.com/appv/lproduc";
+      var obj = { nombre: codigo };
+      $.post(url, obj, function(res) { /* Procesar resultados */ });
+    }
+    ```
+
+---
+
+### Fases de Trabajo - Épica 8
+
+#### Fase 1: Dependencias y Constantes de Conectividad
+- [x] Incorporar el paquete oficial `http: ^1.2.2` en `pubspec.yaml` y ejecutar `flutter pub get`.
+- [x] Crear `lib/core/constants/api_endpoints.dart` con las URLs oficiales:
+  - `baseUrl`: `'https://vous.bossux.com'`
+  - `planesUrl`: `'https://vous.bossux.com/apx/lplanes'`
+  - `buscarProductosUrl`: `'https://vous.bossux.com/appv/lproduc'`
+  - `resolveImageUrl(String path)`: función utilitaria para resolver rutas relativas `_resources/_planes/...`.
+
+#### Fase 2: Capa de Datos (Modelos y Repositorio REST)
+- [x] Crear `lib/features/planes/data/models/plan_model.dart`:
+  - Mapeo seguro de `plan` (nombre), `precio` (precio venta), `tiempo` (cantidad/duración), `foto` (ruta de imagen), `id`, `estado` y `tipo`.
+  - Métodos utilitarios: `precioFormateado` (`Bs. 250` o `Gratis`), `tiempoFormateado` (ej. "1 Mes", "14 Días", "1 Año"), `fullImageUrl`.
+- [x] Definir contrato abstracto `lib/features/planes/data/repositories/planes_repository.dart`:
+  - `Future<List<PlanModel>> getPlanes();`
+  - `Future<List<PlanModel>> searchProductos(String query);`
+- [x] Implementar `lib/features/planes/data/repositories/http_planes_repository.dart` consumiendo los endpoints de `vous.bossux.com` con control de excepciones y timeouts de red.
+
+#### Fase 3: Controlador Reactivo de Planes y Búsqueda
+- [x] Crear `lib/features/planes/presentation/controllers/planes_controller.dart` con `ChangeNotifier`:
+  - Estados: `idle`, `loading`, `success`, `searching`, `error`.
+  - Métodos: `loadPlanes()`, `searchPlanes(String query)`, `clearSearch()`.
+  - Filtrado en vivo y soporte de búsqueda mediante `BuscarCodigo`.
+
+#### Fase 4: Componentes de UI Apple Liquid Glass (Tarjetas y Buscador)
+- [x] Crear `lib/features/planes/presentation/widgets/plan_card.dart`:
+  - Imagen del plan con `Image.network`, indicador de carga y fallback deportivo con gradiente en caso de fallo.
+  - Nombre del plan en tipografía blanca audaz.
+  - Precio de venta resaltado en píldora **Volt Neon / Lime** (`#CCFF00` / `#D4FE11`).
+  - Badge de cantidad/duración (`tiempo`).
+  - Botón interactivo con micro-escala táctil `PressableScale` ("Elegir Plan").
+- [x] Crear `lib/features/planes/presentation/widgets/search_plans_bar.dart` con input estilizado y botón de búsqueda (`BuscarCodigo`).
+
+#### Fase 5: Pantalla de Planes (`PlanesScreen`) e Integración en el Dock Flotante
+- [x] Crear `lib/features/planes/presentation/screens/planes_screen.dart`:
+  - Lista responsiva con Pull-to-Refresh (`RefreshIndicator`).
+  - Shimmer/Skeleton animado de carga.
+  - Estado vacío en caso de búsquedas sin resultados.
+- [x] Actualizar `lib/features/home/presentation/widgets/floating_bottom_nav_bar.dart`:
+  - Añadir botón de navegación **"Planes"** (icono de membresía / ticket) con transición suave entre pestañas.
+- [x] Actualizar `lib/features/home/presentation/screens/home_screen.dart` para renderizar `PlanesScreen` en su respectiva pestaña.
+
+#### Fase 6: Pruebas Unitarias, Análisis Estático y Compilación
+- [x] Crear pruebas unitarias para `PlanModel` y el parseo de respuestas de `vous.bossux.com`.
+- [x] Validar integridad con `flutter analyze` (0 errores).
+- [ ] Probar en emulador/dispositivo y asegurar renderizado óptimo de imágenes reales y respuestas de red.
+
+---
+
 ## Registro de Progreso
 
-| Fecha | Fase | DescripciÃƒÆ’Ã‚Â³n | Estado |
+| Fecha | Fase | Descripción | Estado |
 | :--- | :--- | :--- | :--- |
 | 2026-11-03 | Fase 1 | Tokens de diseÃƒÆ’Ã‚Â±o, tipografÃƒÆ’Ã‚Â­a, espaciado y tema Cal AI | Completado |
 | 2026-11-03 | Fase 2 | Modelos, Excepciones y Repositorio Mock | Completado |
@@ -292,3 +371,4 @@ Transformar la aplicaciÃƒÆ’Ã‚Â³n en **BOSSUX**, una experiencia fitnes
 | 2026-11-04 | Ãƒâ€°pica 7 | RediseÃƒÂ±o BOSSUX: Video Welcome, Login minimalista, Home Bento, Floating Navbar y nuevo APK | Completado |
 | 2026-11-04 | Mejora Visual | TransiciÃ³n a Clean Light Style (Apple Health / Cal AI Light): fondos off-white, tarjetas blancas y APK | Completado |
 | 2026-11-04 | Mejora Visual & Módulos | Cristal translúcido Apple Liquid Glass (Titanium mesh), vistas completas de Analytics y Settings, y APK | Completado |
+| 2026-11-06 | Épica 8 | Módulo dinámico de Planes y Búsqueda (`BuscarCodigo`) con API real de BOSSUX y dock flotante | Completado |

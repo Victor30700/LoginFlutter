@@ -10,6 +10,7 @@ import '../../../auth/presentation/controllers/auth_controller_scope.dart';
 import '../widgets/analytics_view.dart';
 import '../widgets/floating_bottom_nav_bar.dart';
 import '../widgets/settings_view.dart';
+import '../../../planes/presentation/screens/planes_screen.dart';
 
 /// Pantalla Home Principal de BOSSUX con estética Apple Liquid Glass (VisionOS).
 /// Gestiona la navegación fluida entre Home, Analytics y Settings mediante el Dock flotante.
@@ -206,6 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   _buildHomeDashboard(userName, controller),
                   const AnalyticsView(),
+                  const PlanesScreen(),
                   SettingsView(
                     controller: controller,
                     onLogout: () => _handleLogout(context, controller),
