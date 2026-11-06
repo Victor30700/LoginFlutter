@@ -108,9 +108,12 @@ LoginFlutter/
     │   └── utils/
     │       └── validators_test.dart         # Pruebas unitarias de validadores de email y password
     └── features/
-        └── auth/
+        ├── auth/
+        │   └── data/
+        │       └── mock_auth_repository_test.dart# Pruebas unitarias completas de autenticación y registro
+        └── planes/
             └── data/
-                └── mock_auth_repository_test.dart# Pruebas unitarias completas de autenticación y registro
+                └── plan_model_test.dart     # Pruebas unitarias de parseo JSON real y formateo de planes
 ```
 
 ---
@@ -119,11 +122,12 @@ LoginFlutter/
 
 ### 1. `lib/core/` (Capa Transversal)
 * **`constants/`**: Contiene la única fuente de verdad para valores inmutables en la app:
+  * `ApiEndpoints`: Centraliza URLs de producción de BOSSUX (`https://vous.bossux.com/apx/lplanes`, `/appv/lproduc`) y utilidad de resolución de fotos relativas (`resolveImageUrl`).
   * `AppColors`: Paleta de alto contraste inspirada en Cal AI (Volt Neon `#CCFF00`, Cian Eléctrico `#00F0FF`, Índigo Aurora `#6366F1`, Canvas Ónix `#070A12`).
   * `AppSpacing`: Escala uniforme de espaciados (4px a 48px) y radios de borde (`radiusMd: 16`, `radiusLg: 24`, `radiusPill: 999`).
   * `AppStrings`: Textos internacionalizables en español para evitar cadenas sueltas en widgets.
   * `AppTextStyles`: Jerarquía tipográfica con pesos semibold y bold para estética deportiva.
-* **`routing/`**: Centraliza nombres de rutas (`/welcome`, `/login`, `/register`, `/home`) y gestiona transiciones adaptativas.
+* **`routing/`**: Centraliza nombres de rutas (`/welcome`, `/login`, `/register`, `/home`, `/planes`) y gestiona transiciones adaptativas.
 * **`theme/`**: Configura `ThemeData` en modo oscuro Material 3 con estilos personalizados para inputs, botones y efectos de foco.
 * **`utils/`**: Utilidades puras reutilizables como validaciones de correo electrónico, longitud de clave y coincidencia de confirmación.
 * **`widgets/`**: Biblioteca de micro-componentes de interfaz:
@@ -151,10 +155,24 @@ Sigue principios de **Clean Architecture** y **Separación de Responsabilidades*
   * Selector de días de la semana interactivo.
   * Anillo de progreso calórico con desglose de macronutrientes (Proteínas, Carbohidratos, Grasas).
   * Registro de comidas recientes con sellos de tiempo y valores energéticos.
+  * Navegación por pestañas mediante `IndexedStack` (Home, Analytics, Planes, Settings).
 * **`widgets/`**:
-  * `FloatingBottomNavBar`: Dock flotante con efecto de vidrio, navegación entre secciones y botón rápido de registro (+).
+  * `FloatingBottomNavBar`: Dock flotante con efecto de vidrio esmerilado que aloja 4 pestañas de navegación (Inicio, Analíticas, Planes y Ajustes) y botón rápido de registro (+).
   * `AnalyticsView`: Gráfico de barras semanal interactivo con métricas de salud (calorías quemadas, agua, pasos).
   * `SettingsView`: Configuración de metas nutricionales, perfil del atleta, interruptores de sincronización y botón de cierre de sesión.
+
+### 4. `lib/features/planes/` (Catálogo de Membresías y Búsqueda de Productos)
+Implementado bajo la **Épica 8** para sincronización directa con el backend en producción de BOSSUX:
+* **`data/`**:
+  * **Modelo (`plan_model.dart`)**: Modela de forma inmutable los planes con atributos clave: `nombre` (`plan`), `precio` numérico y formateado (`Bs. 250` o `GRATIS`), `tiempo` formateado con sufijos contextuales (`1 Mes`, `14 Días`, `1 Año`), y `fullImageUrl` que resuelve la URL absoluta en `https://vous.bossux.com/`.
+  * **Contrato (`planes_repository.dart`)**: Define las operaciones esenciales `getPlanes()` y `searchProductos(query)`.
+  * **Implementación (`http_planes_repository.dart`)**: Cliente HTTP robusto con timeouts y control de excepciones que consume `GET /apx/lplanes` y `POST /appv/lproduc` (emulando la función `BuscarCodigo()`).
+* **`presentation/`**:
+  * **Controlador (`planes_controller.dart`)**: `ChangeNotifier` que orquesta la carga de catálogo, filtrado local instantáneo, búsqueda remota y toggle de planes activos (`_soloActivos`).
+  * **Pantalla (`planes_screen.dart`)**: Vista de catálogo con soporte para Pull-to-Refresh (`RefreshIndicator`), estados de carga animados (skeletons), manejo amigable de errores de red y modal inferior interactivo para confirmar inscripción.
+  * **Componentes (`widgets/`)**:
+    * `PlanCard`: Tarjeta de diseño *Apple Liquid Glass* con imagen real de red, fallback visual degradado con icono atlético, badge de duración, nombre destacado y precio en Volt Lime (`#CCFF00`).
+    * `SearchPlansBar`: Barra de búsqueda reactiva con input oscuro, botón disparador `Buscar` y chip selector de "Solo Activos".
 
 ---
 
@@ -162,29 +180,47 @@ Sigue principios de **Clean Architecture** y **Separación de Responsabilidades*
 
 ```mermaid
 flowchart TD
-    subgraph UI ["Capa de Presentación"]
+    subgraph UI ["Capa de Presentación (UI)"]
         W["WelcomeScreen"] --> L["LoginScreen"]
         L <--> R["RegisterScreen"]
         L --> H["HomeScreen"]
-        Screens["Screens & Widgets"]
+        H -->|Pestaña 0| HD["HomeDashboard"]
+        H -->|Pestaña 1| AV["AnalyticsView"]
+        H -->|Pestaña 2| PS["PlanesScreen"]
+        H -->|Pestaña 3| SV["SettingsView"]
+        PS --> PC["PlanCard & SearchPlansBar"]
     end
 
-    subgraph State ["Capa de Estado"]
+    subgraph State ["Capa de Estado (State Management)"]
         Scope["AuthControllerScope (InheritedWidget)"]
-        Controller["AuthController (ChangeNotifier)"]
+        AuthController["AuthController (ChangeNotifier)"]
+        PlanesController["PlanesController (ChangeNotifier)"]
     end
 
-    subgraph DomainData ["Capa de Dominio y Datos"]
-        Contract["AuthRepository (Interfaz Abstracta)"]
-        Mock["MockAuthRepository (Memoria & 1.2s delay)"]
-        FutureBackend["Firebase / REST API (Futuro)"]
-        Models["UserModel & AuthException"]
+    subgraph DomainData ["Capa de Dominio y Datos (Data)"]
+        AuthContract["AuthRepository (Interfaz)"]
+        PlanesContract["PlanesRepository (Interfaz)"]
+        MockAuth["MockAuthRepository (Memoria)"]
+        HttpPlanes["HttpPlanesRepository (HTTP Client)"]
+        Models["UserModel & PlanModel"]
+        ApiEndpoints["ApiEndpoints (vous.bossux.com)"]
+    end
+
+    subgraph Backend ["Servidor Backend BOSSUX"]
+        LiveAPI["GET /apx/lplanes & POST /appv/lproduc"]
+        CDN["_resources/_planes/... (Imágenes)"]
     end
 
     Screens --> Scope
-    Scope --> Controller
-    Controller --> Contract
-    Mock -. implementa .-> Contract
-    FutureBackend -. implementa .-> Contract
-    Contract --> Models
+    Scope --> AuthController
+    AuthController --> AuthContract
+    MockAuth -. implementa .-> AuthContract
+    AuthContract --> Models
+
+    PS --> PlanesController
+    PlanesController --> PlanesContract
+    HttpPlanes -. implementa .-> PlanesContract
+    HttpPlanes --> ApiEndpoints
+    ApiEndpoints --> LiveAPI
+    PC -. carga fotos .-> CDN
 ```
