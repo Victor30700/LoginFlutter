@@ -60,9 +60,14 @@ class FloatingBottomNavBar extends StatelessWidget {
                       index: 1,
                     ),
                     _buildNavItem(
+                      icon: Icons.card_membership_rounded,
+                      label: 'Planes',
+                      index: 2,
+                    ),
+                    _buildNavItem(
                       icon: Icons.settings_rounded,
                       label: 'Settings',
-                      index: 2,
+                      index: 3,
                     ),
                     const SizedBox(width: 44.0), // Espacio para el botón flotante +
                   ],
@@ -118,7 +123,7 @@ class FloatingBottomNavBar extends StatelessWidget {
     return PressableScale(
       onTap: () => onTabSelected(index),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

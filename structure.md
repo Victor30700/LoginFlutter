@@ -35,6 +35,7 @@ LoginFlutter/
 │   │
 │   ├── core/                                # Código transversal y compartido (Design System & Utils)
 │   │   ├── constants/
+│   │   │   ├── api_endpoints.dart           # Endpoints oficiales BOSSUX (vous.bossux.com) y resolución de fotos
 │   │   │   ├── app_colors.dart              # Paleta deportiva (Volt Neon #CCFF00, Cyan, Slate, Onyx)
 │   │   │   ├── app_spacing.dart             # Escala de espaciados y radios de curvatura
 │   │   │   ├── app_strings.dart             # Textos centralizados en español (etiquetas, botones, errores)
@@ -84,6 +85,22 @@ LoginFlutter/
 │                   ├── analytics_view.dart      # Gráficos semanales de rendimiento, macros y agua
 │                   ├── floating_bottom_nav_bar.dart# Dock flotante visionOS con selector de tab y botón (+)
 │                   └── settings_view.dart       # Vista de perfil Pro, objetivos nutricionales y ajustes
+│
+│       └── planes/                          # Módulo Catálogo de Planes y Membresías (Épica 8)
+│           ├── data/
+│           │   ├── models/
+│           │   │   └── plan_model.dart          # Modelo inmutable de membresía (nombre, precio, tiempo, foto)
+│           │   └── repositories/
+│           │       ├── planes_repository.dart   # Contrato abstracto
+│           │       └── http_planes_repository.dart# Integración con vous.bossux.com (lplanes & lproduc)
+│           └── presentation/
+│               ├── controllers/
+│               │   └── planes_controller.dart   # Estado reactivo, búsqueda en vivo y filtrado
+│               ├── screens/
+│               │   └── planes_screen.dart       # Catálogo con pull-to-refresh y modal de inscripción
+│               └── widgets/
+│                   ├── plan_card.dart           # Tarjeta Apple Liquid Glass con foto real y Volt Lime
+│                   └── search_plans_bar.dart    # Barra de búsqueda (BuscarCodigo) y filtro de activos
 │
 └── test/
     ├── widget_test.dart                     # Smoke test: renderizado de Welcome y transición a Login

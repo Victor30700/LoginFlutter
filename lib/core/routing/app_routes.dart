@@ -3,6 +3,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/planes/presentation/screens/planes_screen.dart';
 
 /// Centralizador de rutas de la aplicación BOSSUX.
 class AppRoutes {
@@ -12,6 +13,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String home = '/home';
+  static const String planes = '/planes';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -23,6 +25,14 @@ class AppRoutes {
         return _buildPageRoute(const RegisterScreen(), settings);
       case home:
         return _buildPageRoute(const HomeScreen(), settings);
+      case planes:
+        return _buildPageRoute(
+          const Scaffold(
+            backgroundColor: Color(0xFF0F1219),
+            body: SafeArea(child: PlanesScreen()),
+          ),
+          settings,
+        );
       default:
         return _buildPageRoute(const WelcomeScreen(), settings);
     }
