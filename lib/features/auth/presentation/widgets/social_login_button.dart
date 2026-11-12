@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/pressable_scale.dart';
 
 enum SocialProvider { google, apple }
 
 /// Botón estilizado para inicio de sesión social con micro-interacción de escala.
-/// Soporta estilo blanco limpio (estilo oficial de Google en BOSSUX) y estilo oscuro.
+/// Utiliza los íconos oficiales SVG en `assets/icons/` para Google y Apple.
 class SocialLoginButton extends StatelessWidget {
   final SocialProvider provider;
   final VoidCallback? onPressed;
@@ -24,7 +26,9 @@ class SocialLoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isGoogle = provider == SocialProvider.google;
-    final label = isGoogle ? 'Continuar con Google' : 'Continuar con Apple';
+    final label = isGoogle
+        ? AppStrings.continueWithGoogle
+        : AppStrings.continueWithApple;
     final isEnabled = !isLoading && onPressed != null;
 
     final bgColor = useWhiteStyle
@@ -73,7 +77,7 @@ class SocialLoginButton extends StatelessWidget {
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildGoogleLogo(),
+                    _buildProviderLogo(isGoogle: isGoogle, textColor: textColor),
                     const SizedBox(width: 12.0),
                     Text(
                       label,
@@ -91,28 +95,23 @@ class SocialLoginButton extends StatelessWidget {
     );
   }
 
-  Widget _buildGoogleLogo() {
-    // Logo 'G' de Google multicolor estilizado
-    return SizedBox(
+  Widget _buildProviderLogo({
+    required bool isGoogle,
+    required Color textColor,
+  }) {
+    if (isGoogle) {
+      return SvgPicture.asset(
+        'assets/icons/google_logo.svg',
+        width: 22,
+        height: 22,
+      );
+    }
+
+    return SvgPicture.asset(
+      'assets/icons/apple_logo.svg',
       width: 22,
       height: 22,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          RichText(
-            text: const TextSpan(
-              style: TextStyle(
-                fontFamily: 'sans-serif',
-                fontSize: 17,
-                fontWeight: FontWeight.w900,
-              ),
-              children: [
-                TextSpan(text: 'G', style: TextStyle(color: Color(0xFF4285F4))),
-              ],
-            ),
-          ),
-        ],
-      ),
+      colorFilter: ColorFilter.mode(textColor, BlendMode.srcIn),
     );
   }
 }

@@ -17,44 +17,44 @@ class AppleAmbientBackground extends StatelessWidget {
     final size = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0C0F16),
+      backgroundColor: const Color(0xFF07090E),
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // 1. Lienzo Base: Titanio carbón profundo
+          // 1. Lienzo Base: Obsidian / Space Black limpio (estilo Apple Dark Mode)
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF141923),
-                  Color(0xFF0F131C),
-                  Color(0xFF0A0D13),
+                  Color(0xFF0F1219),
+                  Color(0xFF090B10),
+                  Color(0xFF050609),
                 ],
               ),
             ),
           ),
 
-          // 2. Orbe de Luz 1: Volt Lime Deportivo (Superior derecho)
+          // 2. Atmósfera Zafiro muy tenue (Superior derecha, sin resplandor neón)
           Positioned(
-            top: -size.height * 0.05,
-            right: -size.width * 0.15,
-            width: size.width * 0.75,
-            height: size.height * 0.45,
+            top: -size.height * 0.08,
+            right: -size.width * 0.18,
+            width: size.width * 0.78,
+            height: size.height * 0.42,
             child: IgnorePointer(
               child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 95.0, sigmaY: 95.0),
+                imageFilter: ImageFilter.blur(sigmaX: 115.0, sigmaY: 115.0),
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFFD4FE11).withValues(alpha: 0.18),
-                        const Color(0xFFD4FE11).withValues(alpha: 0.05),
+                        const Color(0xFF0A84FF).withValues(alpha: 0.10),
+                        const Color(0xFF004099).withValues(alpha: 0.03),
                         Colors.transparent,
                       ],
-                      stops: const [0.0, 0.5, 1.0],
+                      stops: const [0.0, 0.55, 1.0],
                     ),
                   ),
                 ),
@@ -62,25 +62,24 @@ class AppleAmbientBackground extends StatelessWidget {
             ),
           ),
 
-          // 3. Orbe de Luz 2: Cian Tech (Centro izquierda)
+          // 3. Profundidad Azul Real muy sutil (Centro izquierda)
           Positioned(
-            top: size.height * 0.35,
-            left: -size.width * 0.20,
-            width: size.width * 0.70,
+            top: size.height * 0.34,
+            left: -size.width * 0.22,
+            width: size.width * 0.72,
             height: size.height * 0.40,
             child: IgnorePointer(
               child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 100.0, sigmaY: 100.0),
+                imageFilter: ImageFilter.blur(sigmaX: 120.0, sigmaY: 120.0),
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF00F0FF).withValues(alpha: 0.14),
-                        const Color(0xFF0077FF).withValues(alpha: 0.05),
+                        const Color(0xFF1D4ED8).withValues(alpha: 0.07),
                         Colors.transparent,
                       ],
-                      stops: const [0.0, 0.6, 1.0],
+                      stops: const [0.0, 1.0],
                     ),
                   ),
                 ),
@@ -88,21 +87,21 @@ class AppleAmbientBackground extends StatelessWidget {
             ),
           ),
 
-          // 4. Orbe de Luz 3: Índigo / Púrpura suave (Inferior)
+          // 4. Profundidad Índigo Apple discreta (Inferior)
           Positioned(
-            bottom: -size.height * 0.1,
-            right: size.width * 0.1,
-            width: size.width * 0.8,
-            height: size.height * 0.45,
+            bottom: -size.height * 0.12,
+            right: size.width * 0.08,
+            width: size.width * 0.80,
+            height: size.height * 0.44,
             child: IgnorePointer(
               child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 110.0, sigmaY: 110.0),
+                imageFilter: ImageFilter.blur(sigmaX: 120.0, sigmaY: 120.0),
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF6366F1).withValues(alpha: 0.15),
+                        const Color(0xFF5E5CE6).withValues(alpha: 0.06),
                         Colors.transparent,
                       ],
                     ),

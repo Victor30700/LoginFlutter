@@ -7,13 +7,13 @@ import '../../../../core/widgets/glass_container.dart';
 import '../../../../core/widgets/staggered_entrance.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../auth/presentation/controllers/auth_controller_scope.dart';
-import '../widgets/analytics_view.dart';
 import '../widgets/floating_bottom_nav_bar.dart';
 import '../widgets/settings_view.dart';
 import '../../../planes/presentation/screens/planes_screen.dart';
+import '../../../productos/presentation/screens/productos_screen.dart';
 
 /// Pantalla Home Principal de BOSSUX con estética Apple Liquid Glass (VisionOS).
-/// Gestiona la navegación fluida entre Home, Analytics y Settings mediante el Dock flotante.
+/// Gestiona la navegación fluida entre Home, Productos, Planes y Settings mediante el Dock flotante.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 index: _currentTabIndex,
                 children: [
                   _buildHomeDashboard(userName, controller),
-                  const AnalyticsView(),
+                  const ProductosScreen(),
                   const PlanesScreen(),
                   SettingsView(
                     controller: controller,
@@ -292,39 +292,23 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Barra superior con el nombre BOSSUX, racha de fuego y logout
+  /// Barra superior con el logotipo oficial BOSSUX, racha de fuego y logout
   Widget _buildTopHeader(String userName, AuthController controller) {
     return Row(
       children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: const Color(0xFF161B26),
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.18),
+        Image.asset(
+          'assets/logo/logo_bossux.png',
+          height: 28,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (context, error, stackTrace) => const Text(
+            'BOSSUX',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 20,
+              letterSpacing: 1.5,
             ),
-          ),
-          child: const Center(
-            child: Text(
-              'B',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-                fontSize: 18,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        const Text(
-          'BOSSUX',
-          style: TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-            letterSpacing: 0.5,
           ),
         ),
         const Spacer(),

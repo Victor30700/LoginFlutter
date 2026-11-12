@@ -21,7 +21,7 @@ class HttpPlanesRepository implements PlanesRepository {
     try {
       final uri = Uri.parse(ApiEndpoints.planesUrl);
       final response = await _client
-          .get(uri, headers: {'Accept': 'application/json'})
+          .get(uri)
           .timeout(const Duration(seconds: 12));
 
       if (response.statusCode == 200) {
@@ -52,15 +52,11 @@ class HttpPlanesRepository implements PlanesRepository {
   Future<List<PlanModel>> searchProductos(String query) async {
     try {
       final uri = Uri.parse(ApiEndpoints.buscarProductosUrl);
-      // Simula:
-      // var url = "https://vous.bossux.com/appv/lproduc";
-      // var obj = {nombre: codigo};
-      // $.post(url, obj, function(res) { ... });
       final response = await _client
           .post(
             uri,
-            headers: {'Accept': 'application/json'},
-            body: {'nombre': query.trim()},
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'nombre': query.trim()}),
           )
           .timeout(const Duration(seconds: 10));
 

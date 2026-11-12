@@ -55,8 +55,8 @@ class FloatingBottomNavBar extends StatelessWidget {
                       index: 0,
                     ),
                     _buildNavItem(
-                      icon: Icons.bar_chart_rounded,
-                      label: 'Analytics',
+                      icon: Icons.shopping_bag_rounded,
+                      label: 'Productos',
                       index: 1,
                     ),
                     _buildNavItem(
@@ -85,23 +85,23 @@ class FloatingBottomNavBar extends StatelessWidget {
                 width: 52.0,
                 height: 52.0,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF161B26).withValues(alpha: 0.90),
+                  color: const Color(0xFF141822).withValues(alpha: 0.92),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: AppColors.primaryAccent.withValues(alpha: 0.7),
-                    width: 1.5,
+                    color: Colors.white.withValues(alpha: 0.20),
+                    width: 1.0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primaryGlow,
+                      color: Colors.black.withValues(alpha: 0.42),
                       blurRadius: 14.0,
-                      offset: const Offset(0, 3),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: const Icon(
                   Icons.add_rounded,
-                  color: AppColors.primaryAccent,
+                  color: AppColors.primary,
                   size: 28.0,
                 ),
               ),

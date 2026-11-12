@@ -4,6 +4,8 @@ import '../../data/repositories/planes_repository.dart';
 
 enum PlanesStatus { initial, loading, success, error }
 
+enum PlanCategoryFilter { todos, paquetes, convenios }
+
 /// Controlador que gestiona el estado reactivo del catálogo de planes
 /// y la funcionalidad de búsqueda en vivo (`BuscarCodigo`).
 class PlanesController extends ChangeNotifier {
@@ -16,6 +18,7 @@ class PlanesController extends ChangeNotifier {
   String _currentQuery = '';
   bool _isSearching = false;
   bool _soloActivos = true;
+  PlanCategoryFilter _categoryFilter = PlanCategoryFilter.todos;
 
   PlanesController({required this.repository});
 
@@ -27,6 +30,15 @@ class PlanesController extends ChangeNotifier {
   bool get isSearching => _isSearching;
   bool get isLoading => _status == PlanesStatus.loading;
   bool get soloActivos => _soloActivos;
+  PlanCategoryFilter get categoryFilter => _categoryFilter;
+
+  /// Cambia el filtro de categoría (Todos | Paquetes | Convenios)
+  void setCategoryFilter(PlanCategoryFilter filter) {
+    if (_categoryFilter == filter) return;
+    _categoryFilter = filter;
+    _aplicarFiltrosLocales();
+    notifyListeners();
+  }
 
   /// Cambia el filtro de solo planes activos
   void toggleSoloActivos() {
@@ -54,10 +66,18 @@ class PlanesController extends ChangeNotifier {
       _status = PlanesStatus.success;
     } catch (e) {
       _status = PlanesStatus.error;
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _errorMessage = _formatErrorMessage(e);
     } finally {
       notifyListeners();
     }
+  }
+
+  String _formatErrorMessage(Object e) {
+    final raw = e.toString().replaceFirst(RegExp(r'^(Client)?Exception:\s*'), '');
+    if (kIsWeb && raw.contains('Failed to fetch')) {
+      return 'El navegador bloqueó la petición por CORS (vous.bossux.com no incluye Access-Control-Allow-Origin). Funciona en Android/Windows o habilitando CORS en el servidor.';
+    }
+    return raw;
   }
 
   /// Ejecuta la búsqueda de planes/productos (Equivalente a `BuscarCodigo`)
@@ -107,6 +127,12 @@ class PlanesController extends ChangeNotifier {
 
     if (_soloActivos) {
       resultado = resultado.where((p) => p.esActivo).toList();
+    }
+
+    if (_categoryFilter == PlanCategoryFilter.paquetes) {
+      resultado = resultado.where((p) => !p.esConvenio).toList();
+    } else if (_categoryFilter == PlanCategoryFilter.convenios) {
+      resultado = resultado.where((p) => p.esConvenio).toList();
     }
 
     if (_currentQuery.isNotEmpty) {
