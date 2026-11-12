@@ -71,6 +71,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _handleAppleLogin() async {
+    final success = await _authController.loginWithApple();
+    if (success && mounted) {
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -337,18 +344,60 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           const SizedBox(height: 28),
 
-                          // 8. Botón Social: "Continuar con Google"
+                          // 8. Botones Sociales: Google y Apple
                           StaggeredEntrance(
                             index: 5,
-                            child: SocialLoginButton(
-                              provider: SocialProvider.google,
-                              onPressed: isLoading ? null : _handleGoogleLogin,
-                              isLoading: isLoading,
-                              useWhiteStyle: true,
+                            child: Column(
+                              children: [
+                                SocialLoginButton(
+                                  provider: SocialProvider.google,
+                                  onPressed: isLoading ? null : _handleGoogleLogin,
+                                  isLoading: isLoading,
+                                  useWhiteStyle: true,
+                                ),
+                                const SizedBox(height: 12),
+                                SocialLoginButton(
+                                  provider: SocialProvider.apple,
+                                  onPressed: isLoading ? null : _handleAppleLogin,
+                                  isLoading: isLoading,
+                                  useWhiteStyle: false,
+                                ),
+                              ],
                             ),
                           ),
 
-                          const SizedBox(height: 36),
+                          const SizedBox(height: 24),
+
+                          // Enlace para ir al Registro
+                          Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, AppRoutes.register);
+                              },
+                              behavior: HitTestBehavior.opaque,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                child: RichText(
+                                  text: const TextSpan(
+                                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                                    children: [
+                                      TextSpan(text: AppStrings.noAccountPrompt),
+                                      TextSpan(
+                                        text: AppStrings.registerLink,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
 
                           // 9. Términos y Condiciones al pie
                           Text(
@@ -375,45 +424,38 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  /// Construye el isotipo moderno de BOSSUX con cristal translúcido
+  /// Construye el logotipo oficial de BOSSUX con fondo translúcido y halo cian
   Widget _buildBossuxLogo() {
     return Container(
-      width: 76,
-      height: 76,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF141923).withValues(alpha: 0.85),
+        color: AppColors.bossuxSheetGlass,
         borderRadius: BorderRadius.circular(22.0),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.22),
-          width: 1.5,
+          color: Colors.white.withValues(alpha: 0.16),
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGlow.withValues(alpha: 0.20),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
+            color: AppColors.bossuxAuraCyan.withValues(alpha: 0.18),
+            blurRadius: 24,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: const Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'B',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 34,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -1,
-              ),
-            ),
-            Icon(
-              Icons.bolt_rounded,
-              color: AppColors.primaryAccent,
-              size: 26,
-            ),
-          ],
+      child: Image.asset(
+        'assets/logo/logo_bossux.png',
+        height: 38,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        errorBuilder: (context, error, stackTrace) => const Text(
+          'BOSSUX',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 22,
+            letterSpacing: 2,
+          ),
         ),
       ),
     );

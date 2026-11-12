@@ -11,6 +11,7 @@ class PlanModel {
   final String? fechaInsert;
   final String? user;
   final String? tipo;
+  final String? horario;
 
   const PlanModel({
     required this.id,
@@ -22,6 +23,7 @@ class PlanModel {
     this.fechaInsert,
     this.user,
     this.tipo,
+    this.horario,
   });
 
   /// Nombre público del plan
@@ -32,6 +34,24 @@ class PlanModel {
 
   /// Determina si el plan está activo (`estado == '1'`)
   bool get esActivo => estado == '1';
+
+  /// Determina si corresponde a un convenio (`tipo == '2'`)
+  bool get esConvenio => tipo == '2';
+
+  /// Etiqueta de categoría del plan para el badge superior derecho
+  String get tipoEtiqueta {
+    if (!esActivo) return 'Promo';
+    if (esConvenio) return 'Convenio';
+    return 'Normal';
+  }
+
+  /// Etiqueta de horario legible según campo `h` de la API
+  String get horarioEtiqueta {
+    if (horario == null || horario == '1' || horario!.isEmpty) {
+      return '24 horas';
+    }
+    return horario!;
+  }
 
   /// Determina si es una membresía gratuita o promocional
   bool get esGratis => precio <= 0;
@@ -44,6 +64,16 @@ class PlanModel {
     final esEntero = precio == precio.truncateToDouble();
     final valorStr = esEntero ? precio.toInt().toString() : precio.toStringAsFixed(2);
     return 'Bs. $valorStr';
+  }
+
+  /// Formateo estilo VOUS (ej: "2500 Bs.-", "GRATIS")
+  String get precioCompacto {
+    if (esGratis) {
+      return 'GRATIS';
+    }
+    final esEntero = precio == precio.truncateToDouble();
+    final valorStr = esEntero ? precio.toInt().toString() : precio.toStringAsFixed(2);
+    return '$valorStr Bs.-';
   }
 
   /// Formateo inteligente de la duración o cantidad de tiempo
@@ -94,7 +124,7 @@ class PlanModel {
 
     return PlanModel(
       id: json['id']?.toString() ?? '',
-      plan: json['plan']?.toString().trim() ?? 'Plan sin nombre',
+      plan: (json['plan'] ?? json['nombre'] ?? json['producto'])?.toString().trim() ?? 'Plan sin nombre',
       foto: json['foto']?.toString().trim() ?? '',
       tiempo: json['tiempo']?.toString().trim() ?? '1',
       precio: precioParsed,
@@ -102,6 +132,7 @@ class PlanModel {
       fechaInsert: json['fecha_insert']?.toString(),
       user: json['user']?.toString(),
       tipo: json['tipo']?.toString(),
+      horario: json['h']?.toString().trim(),
     );
   }
 
@@ -117,6 +148,7 @@ class PlanModel {
       if (fechaInsert != null) 'fecha_insert': fechaInsert,
       if (user != null) 'user': user,
       if (tipo != null) 'tipo': tipo,
+      if (horario != null) 'h': horario,
     };
   }
 

@@ -7,7 +7,11 @@ class AppStrings {
   static const String appTagline = 'FITNESS & NUTRITION AI';
   static const String demoBadge = 'BOSSUX PRO';
 
-  // Pantalla de Bienvenida (Welcome Screen)
+  // Pantalla de Bienvenida (Welcome Screen - FitPulse / BOSSUX Style)
+  static const String welcomeHeroTitle = 'Inicia sesión para\ntu éxito fitness';
+  static const String welcomeHeroSubtitle = 'Impulsa tu entrenamiento con una experiencia dinámica diseñada para un estilo de vida saludable.';
+  static const String welcomeSignUpAction = 'REGISTRARSE';
+  static const String welcomeOrLogInAction = 'o Iniciar sesión';
   static const String welcomeHeadline = 'Tu cámara ahora es un contador de calorías';
   static const String welcomeButton = '¡Perfecto!';
   static const String welcomeAlreadyAccount = '¿Ya tienes una cuenta? ';
