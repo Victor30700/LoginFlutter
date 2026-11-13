@@ -191,8 +191,8 @@ class BookSpreadCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFF10B981).withValues(alpha: 0.12), // Tinte esmeralda vítreo
-            const Color(0xFF6366F1).withValues(alpha: 0.08), // Tinte índigo vítreo
+            AppColors.primary.withValues(alpha: 0.08),
+            AppColors.indigoAccent.withValues(alpha: 0.06),
             Colors.white.withValues(alpha: 0.02),
           ],
         ),

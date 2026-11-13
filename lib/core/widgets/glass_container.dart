@@ -42,8 +42,8 @@ class GlassContainer extends StatelessWidget {
           ),
           if (showGlow)
             BoxShadow(
-              color: AppColors.primaryGlow.withValues(alpha: 0.30),
-              blurRadius: 28.0,
+              color: AppColors.primary.withValues(alpha: 0.08),
+              blurRadius: 24.0,
               offset: const Offset(0, 4),
             ),
         ],

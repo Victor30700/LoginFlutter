@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/network/http_client_factory.dart';
 import '../models/plan_model.dart';
 import 'planes_repository.dart';
 
@@ -10,25 +13,25 @@ import 'planes_repository.dart';
 class HttpPlanesRepository implements PlanesRepository {
   final http.Client _client;
 
-  HttpPlanesRepository({http.Client? client}) : _client = client ?? http.Client();
+  HttpPlanesRepository({http.Client? client})
+    : _client = client ?? createPlatformHttpClient();
 
   @override
   Future<List<PlanModel>> getPlanes() async {
     try {
       final uri = Uri.parse(ApiEndpoints.planesUrl);
-      final response = await _client.get(
-        uri,
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'BOSSUX-Flutter-App/1.0',
-        },
-      ).timeout(const Duration(seconds: 12));
+      final response = await _client
+          .get(uri)
+          .timeout(const Duration(seconds: 12));
 
       if (response.statusCode == 200) {
         final decoded = json.decode(utf8.decode(response.bodyBytes));
         if (decoded is List) {
           return decoded
-              .map((item) => PlanModel.fromJson(Map<String, dynamic>.from(item as Map)))
+              .map(
+                (item) =>
+                    PlanModel.fromJson(Map<String, dynamic>.from(item as Map)),
+              )
               .toList();
         }
         return [];
@@ -36,7 +39,9 @@ class HttpPlanesRepository implements PlanesRepository {
         throw Exception('Error del servidor: Código ${response.statusCode}');
       }
     } on TimeoutException {
-      throw Exception('Tiempo de espera agotado al conectar con el servidor BOSSUX.');
+      throw Exception(
+        'Tiempo de espera agotado al conectar con el servidor BOSSUX.',
+      );
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Error al obtener la lista de planes: $e');
@@ -47,19 +52,13 @@ class HttpPlanesRepository implements PlanesRepository {
   Future<List<PlanModel>> searchProductos(String query) async {
     try {
       final uri = Uri.parse(ApiEndpoints.buscarProductosUrl);
-      // Simula:
-      // var url = "https://vous.bossux.com/appv/lproduc";
-      // var obj = {nombre: codigo};
-      // $.post(url, obj, function(res) { ... });
-      final response = await _client.post(
-        uri,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'User-Agent': 'BOSSUX-Flutter-App/1.0',
-        },
-        body: {'nombre': query.trim()},
-      ).timeout(const Duration(seconds: 10));
+      final response = await _client
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'nombre': query.trim()}),
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final bodyText = utf8.decode(response.bodyBytes).trim();
@@ -69,7 +68,10 @@ class HttpPlanesRepository implements PlanesRepository {
         final decoded = json.decode(bodyText);
         if (decoded is List) {
           return decoded
-              .map((item) => PlanModel.fromJson(Map<String, dynamic>.from(item as Map)))
+              .map(
+                (item) =>
+                    PlanModel.fromJson(Map<String, dynamic>.from(item as Map)),
+              )
               .toList();
         }
         return [];

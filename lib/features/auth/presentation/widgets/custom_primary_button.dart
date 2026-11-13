@@ -4,7 +4,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/widgets/pressable_scale.dart';
 
-/// Botón principal estilo píldora Volt Neon con feedback táctil elástico y glow.
+/// Botón principal estilo píldora Azul Eléctrico BOSSUX con feedback táctil elástico y glow.
 class CustomPrimaryButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -37,18 +37,23 @@ class CustomPrimaryButton extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFD6FF1A),
-                    Color(0xFFBFFF00),
+                    AppColors.primary,
+                    Color(0xFF0066D6),
                   ],
                 )
               : null,
           color: isEnabled ? null : AppColors.surfaceElevated,
+          border: isEnabled
+              ? Border.all(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  width: 0.8,
+                )
+              : null,
           boxShadow: isEnabled
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    blurRadius: 22.0,
-                    spreadRadius: -2.0,
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 16.0,
                     offset: const Offset(0, 6),
                   ),
                 ]
